@@ -1,15 +1,11 @@
-import './App.css'
+import { Header, RestaurantDisplay } from './components';
 
-import { Header, RestaurantList, Button } from './components';
-
-function App() {
-
+const App = ()  => {
 
   return (
-    <div className="app">
+    <div className="app flex flex-col">
       <Header />
-      <RestaurantList />
-      <Button />
+      <RestaurantDisplay />
     </div>
   )
 }
