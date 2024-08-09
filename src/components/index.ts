@@ -1,9 +1,11 @@
-import Button from './Button';
-import RestaurantList from './RestaurantList';
+import RestaurantList from './RestaurantDisplay/RestaurantList';
 import Header from './Header';
+import DealsList from './RestaurantDisplay/DealsList';
+import RestaurantDisplay from './RestaurantDisplay/RestaurantDisplay';
 
 export {
-    Button,
     RestaurantList,
     Header,
+    DealsList,
+    RestaurantDisplay,
 };
