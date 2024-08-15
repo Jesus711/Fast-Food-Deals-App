@@ -5,10 +5,14 @@ JS_FILE_PATH="src\components\RestaurantDisplay\retrieveDeals.js"
 
 OUTPUT_PATH="src\components\RestaurantDisplay\deals.ts"
 
+# Prompt the user for input
+read -p "Enter Location to Search for Deals (City, State, Zip/Country): " userInput
+
 # Check if the JavaScript file exists
 if [ -f "$JS_FILE_PATH" ]; then
   # Run the JavaScript file with Node.js and pass the output path as an argument
-  node "$JS_FILE_PATH" "$OUTPUT_PATH"
+  node "$JS_FILE_PATH" "$OUTPUT_PATH" "$userInput" 
+  echo "Script executed"
 else
   echo "Error: JavaScript file not found at $JS_FILE_PATH"
   exit 1
