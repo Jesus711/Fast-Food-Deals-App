@@ -2,7 +2,7 @@ import { Deal } from '../../interfaces/Deal';
 import restaurantsData from '../../constants/constants';
 
 
-const DealCard = ( {text, image, id, url}: Deal ) => (
+const DealCard = ( {text, image, url}: Deal ) => (
   <a href={url} target='_blank' className="xl:w-[480px] w-[360px] xl:h-[390px] h-[300px] flex flex-col justify-around items-center gap-y-4 bg-emerald-500 rounded-xl m-5 py-4 px-3">
     <h1 className="text-black font-semibold text-center xl:text-[24px] text-[18px] ">{text}</h1>
     <div className='flex justify-center items-center'>
