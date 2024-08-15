@@ -5,6 +5,10 @@ import * as fs from "fs";
 
 puppeteer.use(StealthPlugin())
 
+const myLocation = "Pomona, CA 91768, USA" // Replace to your location. Used to find a store near this location to show its deals
+
+const output_path = process.argv[2] || "./deals.ts"
+
 // TODO: Add the link to the item / food item to the data / deal item, so when pressed it directly goes to item's page to add to card
 
 
@@ -16,10 +20,16 @@ async function getDeals() {
 
     const retrievedDate = new Date();
 
+    let MAX_ATTEMPTS_TO_RETRIEVE = 5;
+
+    let amount_retrieved = 0;
+
+    let names = [];
+
     try {
 
         // Read the deals.ts file
-        const lastDealsInfo = fs.readFileSync("deals.ts", 'utf-8')
+        const lastDealsInfo = fs.readFileSync(output_path, 'utf-8')
 
         // If file exists, attempt to extract the last retrieved date
         console.log('File Read');
@@ -60,42 +70,98 @@ async function getDeals() {
 
     const formattedDate = date.join(" ");
 
+    let retrieved = false;
+
     try {
         
-        // Extract all Little Caesar's Deals
-        await getLittleCaesarsDeals(deals);
-       
-        // Extract all Burger King's Offer Deals
-        // Has Mobile Exclusives will implement at a later time
-        await getBurgerKingDeals(deals);
+        for(let i = 0; i < MAX_ATTEMPTS_TO_RETRIEVE; i++){
+            // Extract all Little Caesar's Deals
+            retrieved = await getLittleCaesarsDeals(deals);
+            if (retrieved) {
+                amount_retrieved += 1
+                names.push("Little Caesars")
+                break;
+            }
+        }
 
-        // Extract all Jack in the Box's Deals
-        // Currently Unable due to Cloudflare bot protection
-        await getJackInTheBoxDeals(deals);
+        for(let i = 0; i < MAX_ATTEMPTS_TO_RETRIEVE; i++){
+            // Extract all Burger King's Offer Deals
+            retrieved = await getBurgerKingDeals(deals);
+            if (retrieved) {
+                amount_retrieved += 1
+                names.push("Burger King")
+                break;
+            }
+        }
 
-        // Extract all Wendy's Deals
-        await getWendysDeals(deals);
 
-        // Extract all KFC's Deals
-        await getKFCDeals(deals);
+        for(let i = 0; i < MAX_ATTEMPTS_TO_RETRIEVE; i++){
+            // Extract all Wendy's Deals
+            retrieved = await getWendysDeals(deals);
+            if (retrieved) {
+                amount_retrieved += 1
+                names.push("Wendy's")
+                break;
+            }
+        }
 
-        // Extract all Wingstop's Deals
-        await getWingstopDeals(deals);
+        
+        for(let i = 0; i < MAX_ATTEMPTS_TO_RETRIEVE; i++){
+            // Extract all Jack in the Box's Deals
+            // Currently Unable due to Cloudflare bot protection
+            retrieved = await getJackInTheBoxDeals(deals);
+            if (retrieved) {
+                amount_retrieved += 1
+                names.push("Jack In The Box")
+                break;
+            }
+        }
 
-        // Extract all Carl's Jr Deals
-        await getCarlsjrDeals(deals)
+        for(let i = 0; i < MAX_ATTEMPTS_TO_RETRIEVE; i++){
+            // Extract all KFC's Deals
+            retrieved = await getKFCDeals(deals);
+            if (retrieved) {
+                amount_retrieved += 1
+                names.push("KFC")
+                break;
+            }
+        }
 
-        fs.writeFileSync('deals.ts', `//Last Retrieved: ${retrievedDate.toDateString()}\n\nimport { Deals } from "../../interfaces/Deal";\n\nexport const dateRetrieved = "${formattedDate}";\n\n`)
+        for(let i = 0; i < MAX_ATTEMPTS_TO_RETRIEVE; i++){
+            // Extract all Wingstop's Deals
+            retrieved = await getWingstopDeals(deals);
+            if (retrieved) {
+                amount_retrieved += 1
+                names.push("Wingstop")
+                break;
+            }
+        }
+
+        for(let i = 0; i < MAX_ATTEMPTS_TO_RETRIEVE; i++){
+            // Extract all Carl's Jr Deals
+            retrieved = await getCarlsjrDeals(deals);
+            if (retrieved) {
+                amount_retrieved += 1
+                names.push("Carl's Jr.")
+                break;
+            }
+        }
+
+        fs.writeFileSync(output_path, `//Last Retrieved: ${retrievedDate.toDateString()}\n\nimport { Deals } from "../../interfaces/Deal";\n\nexport const dateRetrieved = "${formattedDate}";\n\n`)
 
 
         // Write all the deals to deals.ts in a json format to be imported
-        fs.appendFile('deals.ts', `const deals: Deals = ${JSON.stringify(deals, null, 2)}\nexport default deals;`, (err) => {
+        fs.appendFile(output_path, `const deals: Deals = ${JSON.stringify(deals, null, 2)}\nexport default deals;`, (err) => {
             if (err) {
                 console.error('Error writing to file', err);
             } else {
                 console.log('Deals written to file successfully');
             }
         });
+
+        console.log(`\nSuccessfully retrieved Deals from ${amount_retrieved} restaurants`)
+        console.log(`Retrieved from: ${names.join(", ")}\n`)
+
     } 
     catch (error) {
         console.log(error.message);
@@ -121,6 +187,30 @@ async function getLittleCaesarsDeals(deals) {
 
         // Wait for dynamic content to load (adjust wait time as needed)
         await page.waitForSelector('div.css-1k7xuet', { visible: true, timeout: 10000 });
+
+
+        // Scroll the page to trigger lazy loading
+        await page.evaluate(async () => {
+            // Scroll to the bottom of the page
+            await new Promise((resolve) => {
+                let totalHeight = 0;
+                const distance = 100;
+                const timer = setInterval(() => {
+                    window.scrollBy(0, distance);
+                    totalHeight += distance;
+
+                    if (totalHeight >= document.body.scrollHeight) {
+                        clearInterval(timer);
+                        resolve();
+                    }
+                }, 100);
+            });
+        });
+
+
+        await new Promise((resolve) => {
+            setTimeout(resolve, 1000);
+        });
         
         const currentDeals = await page.$$eval("div.css-1k7xuet", (divs) => {
             let i = 0;
@@ -141,18 +231,22 @@ async function getLittleCaesarsDeals(deals) {
                 else{
                     item.image = "No Image Found";  
                 }
+
                 item.id = i++;
                 
                 return item;
             })
         });
 
-        console.log(currentDeals);
+        //console.log(currentDeals);
         deals[fastFoodName] = currentDeals;
+        console.log(`Retrieving Deals from ${fastFoodName} Succeeded....`)
+        return true;
     } 
     catch (error) {
         console.log(error.message);
-        return "Error";
+        console.log(`Retrieving Deals from ${fastFoodName} Failed....`)
+        return false;
     }
     finally {
         await browser.close();
@@ -179,9 +273,6 @@ async function getBurgerKingDeals(deals) {
 
     let url = "https://www.bk.com/store-locator" //"https://www.bk.com/rewards/offers";
 
-    let store_location = "https://www.bk.com/store-locator/store/restaurant_3413"
-
-
     try {
         // Navigate to the webpage, local store location
         // May include zip code input if able to fetch
@@ -192,16 +283,15 @@ async function getBurgerKingDeals(deals) {
 
         await page.click("input")
 
-        await page.type("input", "Pomona, CA 91768, USA")
+        await page.type("input", myLocation)
 
-        const list = "div.css-175oi2r.r-1otgn73.r-14lw9ot.r-1jie2fr.r-rs99b7.r-1loqt21.r-h3s6tt.r-1777fci.r-1mdbw0j.r-1qhn6m8.r-i023vh.r-wk8lta.r-13qz1uu"
+        const list = "div.css-175oi2r.r-150rngu.r-eqz5dr.r-16y2uox.r-1wbh5a2.r-agouwx.r-shm4j.r-tabonr.r-1udh08x.r-11yh6sk.r-buy8e9.r-19z077z"
 
         await page.waitForSelector(list, { visible:  true, timeout: 10000 });
 
         // TODO: Sometimes causes Node detached errors. Find a solution to better reduce the error rate
         const listItem = await page.$(`${list} div:nth-child(1)`); // replace with the appropriate selector or index of the list item you want to click
 
-        console.log( await listItem.evaluate((item) => {return item.textContent}))
         
         await listItem.click();
 
@@ -210,17 +300,10 @@ async function getBurgerKingDeals(deals) {
 
         const button = await page.$('button[data-testid="store-card"]')
 
-        const choice = await button.evaluate((button) => {return button.textContent})
-
-        console.log(choice)
-
         await button.click();
 
 
         await page.waitForSelector('button[data-testid="store-modal-order-here"]', { visible:  true, timeout: 10000 });
-
-        const orderHere = await page.$eval('button[data-testid="store-modal-order-here"]', button => button.textContent);
-        console.log(orderHere)
 
 
         await Promise.all([
@@ -297,12 +380,12 @@ async function getBurgerKingDeals(deals) {
         //console.log(currentDeals);
         deals[fastFoodName] = currentDeals;
         console.log(`Retrieving Deals from ${fastFoodName} Succeeded....`)
-        
+        return true;
     } 
     catch (error) {
         console.log("Error: ", error.message);
         console.log(`Retrieving Deals from ${fastFoodName} failed....`)
-        return "Error";
+        return false;
     } 
     finally {
         await browser.close();
@@ -403,7 +486,118 @@ async function getWendysDeals(deals) {
     let fastFoodName = "Wendy's"
     deals[fastFoodName] = []
 
-    
+     // Works when headless = false
+     const browser = await puppeteer.launch({
+        //headless: false, // Launch browser in non-headless mode
+        defaultViewport: null, // Set default viewport
+        args: ['--start-maximized'] // Optionally start maximized
+    });
+
+    const page = await browser.newPage();
+
+    let url = "https://order.wendys.com/location?lang=en_US" //"https://www.wendys.com/"
+
+    try {
+        // Navigate to the webpage, local store location
+        // May include zip code input if able to fetch
+
+        await page.goto(url);
+
+        await page.waitForSelector("button#onetrust-accept-btn-handler", { visible:  true, timeout: 10000 });
+
+        const acceptCookies = await page.$$("#onetrust-button-group");
+
+        await acceptCookies[0].click()//page.click("button#onetrust-accept-btn-handler")
+
+        await page.waitForSelector("input", { visible:  true, timeout: 10000 });
+
+        await page.click("input");
+
+        await page.type("input", myLocation)
+
+        await page.keyboard.press("Enter");
+
+        const list = "div.results-container"
+
+        await page.waitForSelector(list, { visible:  true, timeout: 10000 });
+
+        // Click on the desired list element
+        const listItem = await page.$(`${list} button`); // replace with the appropriate selector or index of the list item you want to click
+        
+        await listItem.click();
+
+        await page.waitForSelector("div.row.menu-grid-flex div", { visible:  true, timeout: 10000 });
+
+        const mealDeals = await page.$("div.row.menu-grid-flex div:last-child button")
+
+        await mealDeals.click();
+
+        let dealsListed = "div#product-list button"
+
+        await page.waitForSelector("div#product-list", { visible:  true, timeout: 10000 });
+
+        const activeDeals = await page.$$(dealsListed);
+        //console.log("Active Deals Count:", activeDeals.length)
+
+        const currentDeals = await page.$$eval(dealsListed, (deals) => {
+            
+            let dealCount = 0;
+            return deals.map(deal => {
+                let item = {}
+                item.id = dealCount++;
+
+                item.text = deal.innerText.split("\n").join(" ");
+
+                let image = deal.querySelector("img");
+                if (image) {
+                    item.image = image.src;
+                }
+                else {
+                    item.image = "No Image Found"
+                }
+
+                return item;
+            })
+
+        });
+
+        const getDealURLS = await page.$$(dealsListed)
+
+        let urlsReceived = 0
+
+        for(let i = 0; i < getDealURLS.length; i++) {
+
+            await page.waitForSelector(dealsListed, { visible:  true, timeout: 10000 });
+
+            const getDealURLS = await page.$$(dealsListed)
+
+            if(getDealURLS[i]){
+
+                await getDealURLS[i].click();
+
+                const url = page.url();
+
+                currentDeals[i].url = url;
+
+                urlsReceived += 1
+
+                await page.goBack();
+            } 
+        }
+
+
+        //console.log(currentDeals);
+        deals[fastFoodName] = currentDeals;
+        console.log(`Retrieving Deals from ${fastFoodName} Succeeded....`)
+        return true;
+
+    } catch(error){
+        console.log(error.message);
+        console.log(`Retrieving Deals from ${fastFoodName} Failed....`)
+        return false;
+    } finally {
+        await browser.close();
+    }
 }
 
 async function getKFCDeals(deals) {
@@ -411,7 +605,6 @@ async function getKFCDeals(deals) {
     let fastFoodName = "KFC"
     deals[fastFoodName] = []
 
-    let location = "Pomona, CA, USA"
 
     let url = "https://www.kfc.com/menu#featured"///menu#deals";
 
@@ -444,7 +637,7 @@ async function getKFCDeals(deals) {
 
             await page.click("input.react-autosuggest__input")
 
-            await page.type("input.react-autosuggest__input", location)
+            await page.type("input.react-autosuggest__input", myLocation)
 
             await page.waitForSelector('ul.react-autosuggest__suggestions-list', { visible:  true, timeout: 10000 });
 
@@ -474,10 +667,6 @@ async function getKFCDeals(deals) {
 
         await agreeDeliveryFeeButton.click();
 
-        console.log("I agree button clicked...")
-
-        console.log("Wait for Featured Selector")
-
         await page.waitForSelector("button.PreOrderBar_pre-order-bar__change__SfDGJ", { visible: true, timeout: 15000 });
 
         await page.reload();
@@ -486,7 +675,7 @@ async function getKFCDeals(deals) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        await sleep(2000);
+        await sleep(1000);
         
         await page.waitForSelector("div.PlpMenuPage_category-group-items__p0pb8",{ visible:  true, timeout: 10000 });
         // Div: PlpMenuPage_category-group-items__p0pb8
@@ -497,7 +686,6 @@ async function getKFCDeals(deals) {
             })
         })
 
-        console.log(buttons)
         
         const featuredButton = await page.$$("div.PlpMenuPage_category-group-items__p0pb8 button")
 
@@ -507,16 +695,10 @@ async function getKFCDeals(deals) {
             return button.textContent
         })
 
-        console.log("Pressing ", desiredButton)
-
-        // await page.goto(url)
-
         await Promise.all([
             page.waitForNavigation({timeout: 10000}),
             featuredButton[1].click(),
         ])
-
-
 
         await page.waitForSelector('a.ProductCard_product-card__qdw_a', { visible: true, timeout: 15000 });
 
@@ -547,11 +729,15 @@ async function getKFCDeals(deals) {
             })
 
         }, text);
-        console.log(currentDeals);
+        //console.log(currentDeals);
         deals[fastFoodName] = currentDeals;
+        console.log(`Retrieving Deals from ${fastFoodName} Succeeded....`)
+        return true;
     } 
     catch (error) {
         console.log(error.message);
+        console.log(`Retrieving Deals from ${fastFoodName} Failed....`)
+        return false;
     } finally {
         await browser.close()
     }
@@ -561,6 +747,8 @@ async function getWingstopDeals(deals) {
 
     let fastFoodName = "Wingstop"
     deals[fastFoodName] = []
+
+    return true;
 }
 
 
@@ -568,6 +756,8 @@ async function getCarlsjrDeals(deals) {
 
     let fastFoodName = "Carl's Jr"
     deals[fastFoodName] = []
+
+    return true
 }
 
 
