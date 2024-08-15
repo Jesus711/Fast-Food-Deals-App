@@ -5,15 +5,11 @@ import * as fs from "fs";
 
 puppeteer.use(StealthPlugin())
 
-const myLocation = "Pomona, CA 91768, USA" // Replace to your location. Used to find a store near this location to show its deals
 
 const output_path = process.argv[2] || "./deals.ts"
 
-// TODO: Add the link to the item / food item to the data / deal item, so when pressed it directly goes to item's page to add to card
+const myLocation = process.argv[3] || "Los Angeles, CA, USA" // Replace to your location. Used to find a store near this location to show its deals
 
-
-// TODO: Fix Error where deals are still retrieved despite the next retrieve Date has not passed
-// TODO: Add console log messages showing which of the Fast Food Restaurants were successfully retrieved
 async function getDeals() {
     
     const deals = {}; // Empty object that will be populated with all the fast food restaurants deals
@@ -26,44 +22,47 @@ async function getDeals() {
 
     let names = [];
 
-    try {
+    // TODO: Decide if to prevent script from running again if on same day / Week
+    // try {
 
-        // Read the deals.ts file
-        const lastDealsInfo = fs.readFileSync(output_path, 'utf-8')
+    //     // Read the deals.ts file
+    //     const lastDealsInfo = fs.readFileSync(output_path, 'utf-8')
 
-        // If file exists, attempt to extract the last retrieved date
-        console.log('File Read');
-        let firstLine = lastDealsInfo.toString().split('\n')[0];
-        let lastDate = firstLine.split(":")[1].trim()
-        console.log(lastDate)
+    //     // If file exists, attempt to extract the last retrieved date
+    //     console.log('File Read');
+    //     let firstLine = lastDealsInfo.toString().split('\n')[0];
+    //     let lastDate = firstLine.split(":")[1].trim()
+    //     console.log(lastDate)
 
-        const lastRetrievedDate = new Date(lastDate);
+    //     const lastRetrievedDate = new Date(lastDate);
 
-        // Check if the last retrieved date does not equal to today's date
-        if(lastRetrievedDate.toDateString() !== retrievedDate.toDateString()){
+    //     // Check if the last retrieved date does not equal to today's date
+    //     if(lastRetrievedDate.toDateString() !== retrievedDate.toDateString()){
 
-            // Check a date object containing next week's date based on last retrieved date
-            const nextRetrieveDate = new Date();
-            nextRetrieveDate.setDate(lastRetrievedDate.getDate() + 7);
-            console.log(`Last Retrieved: ${lastRetrievedDate.toDateString()} : Next Scheduled ${nextRetrieveDate.toDateString()}`)
+    //         // Check a date object containing next week's date based on last retrieved date
+    //         const nextRetrieveDate = new Date();
+    //         nextRetrieveDate.setDate(lastRetrievedDate.getDate() + 7);
+    //         console.log(`Last Retrieved: ${lastRetrievedDate.toDateString()} : Next Scheduled ${nextRetrieveDate.toDateString()}`)
 
-            // Check if a week has passed in order to retrieve the deals again else do not run and return;
-            if (retrievedDate.getDate() > nextRetrieveDate.getDate()){
-                console.log("A Week has not passed. No retrieval needed.")
-                return;
-            }
+    //         // Check if a week has passed in order to retrieve the deals again else do not run and return;
+    //         if (retrievedDate.getDate() > nextRetrieveDate.getDate()){
+    //             console.log("A Week has not passed. No retrieval needed.")
+    //             return;
+    //         }
 
-            // else we continue with the program
-            console.log("Retrieving this week's deals............")
-        } else {
-            console.log("The deals are still update. No Need for new retrieval");
-            return;
-        }
+    //         // else we continue with the program
+    //         console.log("Retrieving this week's deals............")
+    //     } else {
+    //         console.log("The deals are still update. No Need for new retrieval");
+    //         return;
+    //     }
 
-    } catch (err) {
-        console.log("No Deal file has been created yet or file' data was changed...")
-        console.log("\nStart deal retrieval.....")
-    }
+    // } catch (err) {
+    //     console.log("No Deal file has been created yet or file' data was changed...")
+    //     console.log("\nStart deal retrieval.....")
+    // }
+
+    console.log("\nStarting deal retrieval.....")
 
     const date = retrievedDate.toDateString().split(" ").splice(1);
     date[1] = Number.parseInt(date[1]) + ',';
@@ -147,7 +146,7 @@ async function getDeals() {
             }
         }
 
-        fs.writeFileSync(output_path, `//Last Retrieved: ${retrievedDate.toDateString()}\n\nimport { Deals } from "../../interfaces/Deal";\n\nexport const dateRetrieved = "${formattedDate}";\n\n`)
+        fs.writeFileSync(output_path, `//Last Retrieved: ${retrievedDate.toDateString()}\n\nimport { Deals } from "../../interfaces/Deal";\n\nexport const dateRetrieved = "${formattedDate}"\nexport const area = "${myLocation}";\n\n`)
 
 
         // Write all the deals to deals.ts in a json format to be imported

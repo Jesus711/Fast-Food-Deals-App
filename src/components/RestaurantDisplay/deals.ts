@@ -2,7 +2,8 @@
 
 import { Deals } from "../../interfaces/Deal";
 
-export const dateRetrieved = "Aug 15, 2024";
+export const dateRetrieved = "Aug 15, 2024"
+export const area = "Los Angeles, CA, USA";
 
 const deals: Deals = {
   "Little Caesars": [
@@ -110,7 +111,7 @@ const deals: Deals = {
   "Wendy's": [
     {
       "id": 0,
-      "text": "Bacon Double Stack™ Biggie™ Bag $9.00",
+      "text": "Bacon Double Stack™ Biggie™ Bag $8.00",
       "image": "https://app.wendys.com/unified/assets/menu/pg-cropped/1759_small_US_en.png",
       "url": "https://order.wendys.com/product/31473?lang=en_US"
     },
@@ -128,19 +129,19 @@ const deals: Deals = {
     },
     {
       "id": 3,
-      "text": "Jr. Bacon Cheeseburger Biggie™ Bag $8.00",
+      "text": "Jr. Bacon Cheeseburger Biggie™ Bag $7.00",
       "image": "https://app.wendys.com/unified/assets/menu/pg-cropped/1761_small_US_en.png",
       "url": "https://order.wendys.com/product/31476?lang=en_US"
     },
     {
       "id": 4,
-      "text": "Double Stack™ Biggie™ Bag $8.00",
+      "text": "Double Stack™ Biggie™ Bag $7.00",
       "image": "https://app.wendys.com/unified/assets/menu/pg-cropped/1762_small_US_en.png",
       "url": "https://order.wendys.com/product/31477?lang=en_US"
     },
     {
       "id": 5,
-      "text": "Jr. Cheeseburger – 444 Meal $7.00",
+      "text": "Jr. Cheeseburger – 444 Meal $5.00",
       "image": "https://app.wendys.com/unified/assets/menu/pg-cropped/1098_small_US_en.png",
       "url": "https://order.wendys.com/product/31109?lang=en_US"
     }
@@ -167,7 +168,7 @@ const deals: Deals = {
     },
     {
       "id": 3,
-      "text": "Taste of KFC 4 pc. Drums & Thighs Deal Cal.: 1080-1620 $12.00",
+      "text": "Taste of KFC 4 pc. Drums & Thighs Deal Cal.: 1080-1620 $10.00",
       "url": "https://www.kfc.com/menu/featured/taste-of-kfc-4-piece-drums-and-thighs-deal",
       "image": "https://digitaleat.kfc.com/menus/image/bare/kfc-TasteofKFCValueCA4pc.webp?q=75"
     },
@@ -185,7 +186,7 @@ const deals: Deals = {
     },
     {
       "id": 6,
-      "text": "NEW 10 pc. Saucy Nuggets Combo Cal.: 900-1330 $9.99",
+      "text": "NEW 10 pc. Saucy Nuggets Combo Cal.: 900-1330 $10.99",
       "url": "https://www.kfc.com/menu/featured/10-piece-saucy-nuggets-combo",
       "image": "https://digitaleat.kfc.com/menus/image/bare/kfc-10pcHonGarlicNuggetsCombo.webp?q=75"
     },
@@ -197,19 +198,19 @@ const deals: Deals = {
     },
     {
       "id": 8,
-      "text": "DIGITAL EXCLUSIVE Saucy Chicken Sandwich Combo Cal.: 920-1280 $9.99",
+      "text": "DIGITAL EXCLUSIVE Saucy Chicken Sandwich Combo Cal.: 920-1280 $11.29",
       "url": "https://www.kfc.com/menu/featured/saucy-sandwich-combo",
       "image": "https://digitaleat.kfc.com/menus/image/bare/kfc-HonGarlicSandwichCombo.webp?q=75"
     },
     {
       "id": 9,
-      "text": "DIGITAL EXCLUSIVE Saucy Chicken Sandwich Cal.: 590-670 $5.99",
+      "text": "DIGITAL EXCLUSIVE Saucy Chicken Sandwich Cal.: 590-670 $6.99",
       "url": "https://www.kfc.com/menu/featured/saucy-sandwich",
       "image": "https://digitaleat.kfc.com/menus/image/bare/kfc-HonGarlicSandwich.webp?q=75"
     },
     {
       "id": 10,
-      "text": "Apple Pie Poppers Cal.: 340-850 $2.49",
+      "text": "Apple Pie Poppers Cal.: 340-850 $2.99",
       "url": "https://www.kfc.com/menu/featured/apple-pie-poppers",
       "image": "https://digitaleat.kfc.com/menus/image/bare/kfc-4pcPiePoppers.webp?q=75"
     },
@@ -221,13 +222,13 @@ const deals: Deals = {
     },
     {
       "id": 12,
-      "text": "Fill Up Box Cal.: 2600-3630 $23.00",
+      "text": "Fill Up Box Cal.: 2600-3630 $24.99",
       "url": "https://www.kfc.com/menu/featured/fill-up-box",
       "image": "https://digitaleat.kfc.com/menus/image/bare/kfc-FillUpBox.webp?q=75"
     },
     {
       "id": 13,
-      "text": "DIGITAL EXCLUSIVE 8 pc. Chicken + 8 Tenders Fill Up Cal.: 5080-6800 $40.00",
+      "text": "DIGITAL EXCLUSIVE 8 pc. Chicken + 8 Tenders Fill Up Cal.: 5080-6800 $39.99",
       "url": "https://www.kfc.com/menu/featured/8-piece-chicken-and-8-tenders-meal",
       "image": "https://digitaleat.kfc.com/menus/image/bare/kfc-8pcBucket&8TendersBucket.webp?q=75"
     }
