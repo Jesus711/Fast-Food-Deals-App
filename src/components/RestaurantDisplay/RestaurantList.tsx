@@ -12,15 +12,15 @@ interface Restaurant {
 
 
 const RestaurantCard = ({ title, url, image, activeSelection, handleSelection }: Restaurant) => (
-      <div className={`flex flex-col w-[368px] justify-center items-center p-4 m-2 ${activeSelection === title ? "bg-emerald-400" : "bg-slate-400"} rounded-xl ${activeSelection === title ? "" : "hover:bg-gray-300"}`}>
+      <div className={`flex flex-col lg:w-[368px] w-[300px] justify-center items-center p-4 m-2 ${activeSelection === title ? "bg-emerald-400" : "bg-slate-400"} rounded-xl ${activeSelection === title ? "" : "hover:bg-gray-300"}`}>
       <h1 className="text-center text-[28px] font-semibold">{title}</h1>
       <div className="w-full h-[90px] my-2 flex justify-center items-center">
         <img src={image} alt={title} className="w-[60%] h-full object-contain" />
       </div>
           {deals[title].length > 0 ? (
             <div className="w-full flex flex-row justify-between items-center">
-              <a href={url} target='_blank' className='text-[18px] px-4 py-2 bg-slate-600 text-white rounded-[16px]' >Go to Website</a>
-              <button type="button" onClick={() => handleSelection(title)} className="text-white font-semibold text-[18px] rounded-[16px] bg-slate-600 px-4 py-2" >{activeSelection !== title ? "View Deals" : "Displaying"}</button>
+              <a href={url} target='_blank' className='lg:text-[18px] text-[16px] px-4 py-2 bg-slate-600 text-white rounded-[16px]' >Go to Website</a>
+              <button type="button" onClick={() => handleSelection(title)} className="text-white font-semibold lg:text-[18px] text-[16px] rounded-[16px] bg-slate-600 px-4 py-2" >{activeSelection !== title ? "View Deals" : "Displaying"}</button>
             </div>
           ) : (
             <h1 className="text-[28px] font-bold italic">Coming Soon!!!</h1>
